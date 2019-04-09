@@ -1,22 +1,15 @@
 import random, sys
 
 from parsers import WeatherComParser, AirMattersParser
-
-try:
-    # Works on Pythonista on iOS, might want to adapt to other TTS engine
-    import speech
-    def announce(text):
-        speech.say(text, "pl_PL")
-except:
-    def announce(text):
-        print(text)
-
+from tts_output import TTS
 
 name = "Marcin"
 
 greetings = ["Cześć", "Witaj", "Dzień dobry"]
 suggestion_beginnings = ['Przyda Ci się', 'Rzeczy potrzebne dziś to']
 rainy_words = ['deszcze', 'opady', 'burze']
+
+tts = TTS()
 
 try:
     w = WeatherComParser()
@@ -26,7 +19,7 @@ try:
     # Looking for open api to get local results, for now hardcoded
     air = a.get_warsaw_aqi()
 except:
-    announce("Brak połączenia z siecią.")
+    tts.speak("Brak połączenia z siecią.")
     sys.exit(1)
 
 suggested_items = []
@@ -48,16 +41,18 @@ if len(suggested_items) > 0:
 else:
     suggestion = ""
 
-announcement = "{greeting} {name}, na dworze jest {temp}, {description}, odczuwalna temperatura to {feels}, wskaźnik jakości powietrza A.Q.I. wynosi {aqi}, {suggestion}"\
+announcement = "{greeting} {name}, na dworze jest {temp}, {description}, odczuwalna temperatura to {feels}, " \
+               "a w ciągu dnia dojdzie do {max_temp}, wskaźnik jakości powietrza A.Q.I. wynosi {aqi}, {suggestion}"\
     .format(greeting=random.choice(greetings),
                    name=name,
                    temp=weather['temp'],
+                   max_temp=weather['max_temp'],
                    description=weather['description'],
                    feels=weather['feels'],
                    aqi=air['aqi'],
                    suggestion=suggestion)
 
-announce(announcement)
+tts.speak(announcement)
 exit(0)
 
 

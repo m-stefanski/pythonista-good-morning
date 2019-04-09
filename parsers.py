@@ -9,11 +9,13 @@ class WeatherComParser:
         soup = BeautifulSoup(page.content, "html.parser")
 
         temp = soup.find('div', 'today_nowcard-temp').contents[0].text
+        max_temp = soup.find('span', 'deg-hilo-nowcard').text
         feels = soup.find('span', 'deg-feels').text
         description = soup.find('div', 'today_nowcard-phrase').contents[0]
 
         return {
             'temp': temp,
+            'max_temp': max_temp,
             'description': description,
             'feels': feels,
         }
