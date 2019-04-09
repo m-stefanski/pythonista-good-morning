@@ -1,12 +1,15 @@
-import random
+import random, sys
+
 from parsers import WeatherComParser, AirMattersParser
 
 try:
     # Works on Pythonista on iOS, might want to adapt to other TTS engine
     import speech
-    can_speak = True
+    def announce(text):
+        speech.say(text, "pl_PL")
 except:
-    can_speak = False
+    def announce(text):
+        print(text)
 
 
 name = "Marcin"
@@ -15,12 +18,16 @@ greetings = ["Cześć", "Witaj", "Dzień dobry"]
 suggestion_beginnings = ['Przyda Ci się', 'Rzeczy potrzebne dziś to']
 rainy_words = ['deszcze', 'opady', 'burze']
 
-w = WeatherComParser()
-weather = w.get_local_weather()
-
-a = AirMattersParser()
-# Looking for open api to get local results, for now hardcoded
-air = a.get_warsaw_aqi()
+try:
+    w = WeatherComParser()
+    weather = w.get_local_weather()
+    
+    a = AirMattersParser()
+    # Looking for open api to get local results, for now hardcoded
+    air = a.get_warsaw_aqi()
+except:
+    announce("Brak połączenia z siecią.")
+    sys.exit(1)
 
 suggested_items = []
 
@@ -50,12 +57,8 @@ announcement = "{greeting} {name}, na dworze jest {temp}, {description}, odczuwa
                    aqi=air['aqi'],
                    suggestion=suggestion)
 
-
-if can_speak:
-    speech.say(announcement, "pl_PL")
-else:
-    print(announcement)
-
+announce(announcement)
+exit(0)
 
 
 
